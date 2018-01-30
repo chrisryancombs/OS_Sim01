@@ -3,6 +3,7 @@
 #include <string.h>
 
 struct config read_config(const char *filename);
+int get_keynum(char *key);
 
 struct config
 {
