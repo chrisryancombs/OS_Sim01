@@ -18,7 +18,9 @@ struct config read_config(const char *filename)
 
   char line[MAX_STR];
   int line_count = 0;
-  char *key = "";
+  char *key;
+  char *val;
+  struct config config_values;
 
   FILE *configfile = fopen(filename, "r");
   if (configfile == NULL)
@@ -44,33 +46,61 @@ struct config read_config(const char *filename)
       }
       else
       {
+        line_count++;
         key = strtok(line, ":");
+        val = strtok(NULL, " ");
         switch(get_keynum(key))
         {
           case VERSION :
-            fprintf(stderr, "doo\n");
+            config_values.version = atoi(val);
+            break;
+
           case FILEPATH :
-            fprintf(stderr, "yo\n");
+            config_values.filepath = val;
+            break;
+
           case CPU_CODE :
-            fprintf(stderr, "cpu\n");
+            if (strcmp(val, "NONE") == 0)
+            {
+              val = "FCFS-N";
+            }
+            config_values.cpu_scheduling_code = val;
+            break;
+
           case QUANTUM_TIME :
-            fprintf(stderr, "q\n");
+            config_values.quantum_time = atoi(val);
+            break;
+
           case MEM_AVAILABLE :
-            fprintf(stderr, "mem\n");
+            config_values.memory_available = atoi(val);
+            break;
+
           case PROC_TIME :
-            fprintf(stderr, "pr\n");
+            config_values.processor_time = atoi(val);
+            break;
+
           case IO_TIME :
-            fprintf(stderr, "io\n");
+            config_values.io_time = atoi(val);
+            break;
+
           case LOG_TO :
-            fprintf(stderr, "to\n");
+            config_values.log_to = val;
+            break;
+
           case LOG_PATH :
-            fprintf(stderr, "path\n");
+            config_values.log_filepath = val;
+            break;
         }
       }
     }
   }
+
+  return config_values;
 }
 
+
+// Helper function to get a int value for out current key. This allows for a
+// clean switch statement in the read_config function.
 int get_keynum(char *key)
 {
   if(strcmp(key, "Version/Phase") == 0)
@@ -109,4 +139,6 @@ int get_keynum(char *key)
   {
     return LOG_PATH;
   }
+  else
+    return 0;
 }
