@@ -72,6 +72,11 @@ struct metadata *read_metadata(const char *filename)
                 fprintf(stderr, "parsing: %s\n", left );
                 current_node = create_metadata_node(left);
 
+                fprintf(stderr, "Node-------\n");
+                fprintf(stderr, "letter: %c\n", current_node->letter);
+                fprintf(stderr, "command: %s\n", current_node->command);
+                fprintf(stderr, "number: %d\n", current_node->number);
+
                 string_token_right(line, line, ';');
                 string_token_right(left, right, '.');
                 if(strcmp(right, "") == 0)
@@ -99,11 +104,12 @@ struct metadata *read_metadata(const char *filename)
                         exit(1);
                     }
 
-                struct metadata *meta_child = malloc(sizeof(struct metadata));
-                meta_child->command = malloc(MAX_STR);
 
-                current_node->nextnode = meta_child;
-                current_node = meta_child;
+                struct metadata *next_node = malloc(sizeof(struct metadata));
+                next_node->command = malloc(MAX_STR);
+
+                current_node->nextnode = next_node;
+                current_node = next_node;
 
                 if (strcmp(line, "") == 0)
                 {
@@ -185,15 +191,33 @@ struct metadata *create_metadata_node(char *string)
     {
         meta_node->command[command_iter++] = string[command_count++];
     }
-
+ // --------------------
     int number_count = command_count + 1;
     int number_iter = 0;
-    char *numstring[MAX_STR];
+    char numstring[MAX_STR];
+    numstring[MAX_STR-2] = 0;
+    printf("NumC: %d, NumI: %d\nRest: %s\nNumString: %s\n", number_count, number_iter, string + number_count, numstring);
     while(string[number_count] != '\0')
     {
+        fprintf(stderr, "num: %c\n", string[number_count]);
         numstring[number_iter++] = string[number_count++];
     }
+    printf("iter: %d\n", number_iter);
+    numstring[number_iter] = '\0';
+//-----------------
+    for (int i = 0; i< number_iter + 1; i++)
+    {
+        printf("N: %d\n", numstring[i]);
+    }
+    int i = 0;
+    while(numstring[i] != '\0')
+    {
+        printf("%c", numstring[i++]);
+    }
+    printf("\n");
+    printf("num: %s\n", numstring);
+    fprintf(stderr, "numstring: %s\n", numstring);
     meta_node->number = atoi(numstring);
-
+    exit(0);
     return meta_node;
 }
