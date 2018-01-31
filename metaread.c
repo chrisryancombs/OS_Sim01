@@ -68,18 +68,17 @@ struct metadata *read_metadata(const char *filename)
 
             while(1)
             {
-                if (strcmp(line, "") == 0)
+                string_token_left(line, left, ';');
+                fprintf(stderr, "parsing: %s\n", left );
+                meta_node = create_metadata_node(left);
+
+                string_token_right(line, line, ';');
+                string_token_right(left, right, '.');
+                if(strcmp(right, "") == 0)
                 {
-                    fprintf(stderr, "end\n" );
+                    fprintf(stderr, "end of commands\n" );
                     break;
                 }
-
-                string_token_left(line, left, ';');
-                fprintf(stderr, "left: %s\n", left );
-                string_token_right(line, line, ';');
-                fprintf(stderr, "line: %s\n", line);
-
-                meta_node = create_metadata_node(left);
 
                 if ((meta_node->letter != 'A' &&
                     meta_node->letter != 'I' &&
@@ -96,9 +95,15 @@ struct metadata *read_metadata(const char *filename)
                     strcmp(meta_node->command, "run") != 0 &&
                     strcmp(meta_node->command, "start") != 0))
                     {
-                        fprintf(stderr, "Error: Found incorrect value iin metadata file.\n");
+                        fprintf(stderr, "Error: Found incorrect value in metadata file.\n");
                         exit(1);
                     }
+
+                if (strcmp(line, "") == 0)
+                {
+                    fprintf(stderr, "end\n" );
+                    break;
+                }
 
             }
 
@@ -117,6 +122,10 @@ void string_token_left(char *string, char* substring, char delim)
     while (string[count] != delim){
         substring[count] = string[count];
         count++;
+        if(string[count] == '\n')
+        {
+            return;
+        }
     }
     substring[count] = '\0';
 }
@@ -127,6 +136,10 @@ void string_token_right(char *string, char* substring, char delim)
     while (string[count] != delim)
     {
         count++;
+        if (string[count] == '\n')
+        {
+            return;
+        }
     }
     count++;
 
