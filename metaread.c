@@ -14,9 +14,9 @@ struct metadata *read_metadata(const char *filename)
 
     // Create Parent and child node for linked list
     struct metadata *meta_head = malloc(sizeof(struct metadata));;
-    struct metadata *meta_node = malloc(sizeof(struct metadata));
-    meta_node->command = malloc(MAX_STR);
-    meta_head = meta_node;
+    struct metadata *current_node = malloc(sizeof(struct metadata));
+    current_node->command = malloc(MAX_STR);
+    meta_head = current_node;
 
     char line[MAX_STR];
     int line_count = 0;
@@ -70,7 +70,7 @@ struct metadata *read_metadata(const char *filename)
             {
                 string_token_left(line, left, ';');
                 fprintf(stderr, "parsing: %s\n", left );
-                meta_node = create_metadata_node(left);
+                current_node = create_metadata_node(left);
 
                 string_token_right(line, line, ';');
                 string_token_right(left, right, '.');
@@ -80,24 +80,30 @@ struct metadata *read_metadata(const char *filename)
                     break;
                 }
 
-                if ((meta_node->letter != 'A' &&
-                    meta_node->letter != 'I' &&
-                    meta_node->letter != 'M' &&
-                    meta_node->letter != 'O' &&
-                    meta_node->letter != 'P' &&
-                    meta_node->letter != 'S') ||
-                    (strcmp(meta_node->command, "access") != 0 &&
-                    strcmp(meta_node->command, "allocate") != 0 &&
-                    strcmp(meta_node->command, "end") != 0 &&
-                    strcmp(meta_node->command, "hard drive") != 0 &&
-                    strcmp(meta_node->command, "keyboard") != 0 &&
-                    strcmp(meta_node->command, "printer") != 0 &&
-                    strcmp(meta_node->command, "run") != 0 &&
-                    strcmp(meta_node->command, "start") != 0))
+                if ((current_node->letter != 'A' &&
+                    current_node->letter != 'I' &&
+                    current_node->letter != 'M' &&
+                    current_node->letter != 'O' &&
+                    current_node->letter != 'P' &&
+                    current_node->letter != 'S') ||
+                    (strcmp(current_node->command, "access") != 0 &&
+                    strcmp(current_node->command, "allocate") != 0 &&
+                    strcmp(current_node->command, "end") != 0 &&
+                    strcmp(current_node->command, "hard drive") != 0 &&
+                    strcmp(current_node->command, "keyboard") != 0 &&
+                    strcmp(current_node->command, "printer") != 0 &&
+                    strcmp(current_node->command, "run") != 0 &&
+                    strcmp(current_node->command, "start") != 0))
                     {
                         fprintf(stderr, "Error: Found incorrect value in metadata file.\n");
                         exit(1);
                     }
+
+                struct metadata *meta_child = malloc(sizeof(struct metadata));
+                meta_child->command = malloc(MAX_STR);
+
+                current_node->nextnode = meta_child;
+                current_node = meta_child;
 
                 if (strcmp(line, "") == 0)
                 {
