@@ -1,4 +1,21 @@
+// Code Implementation File Information /////////////////////////////
+/**
+* @file metaread.c
+*
+* @brief Implementation file for metaread code
+*
+* @details Implements all functions of the metaread utilities
+*
+*
+* @version 1.00
+* C.S. Student (2 February 2018)
+* Initial development and testing of metaread code
+*
+* @note Requires metaread.h
+*/
+
 #include "metaread.h"
+
 
 const int MAX_STR = 1024;
 
@@ -26,12 +43,12 @@ struct metadata *read_metadata(const char *filename)
 
         fgets(line, MAX_STR, metadata_file);
 
-        if(strcmp(line, "\n") == 0)
+        if(string_compare(line, "\n") == 0)
         {
             break;
         }
 
-        if(line_count == 0 && strcmp(line, "Start Program Meta-Data Code:\n") != 0)
+        if(line_count == 0 && string_compare(line, "Start Program Meta-Data Code:\n") != 0)
         {
             fprintf(stderr, "Error: No start statement");
             exit(1);
@@ -41,7 +58,7 @@ struct metadata *read_metadata(const char *filename)
 
         }
 
-        if(strcmp(line, "Start Program Meta-Data Code:\n")==0)
+        if(string_compare(line, "Start Program Meta-Data Code:\n")==0)
         {
           if (line_count ==0)
           {
@@ -55,7 +72,7 @@ struct metadata *read_metadata(const char *filename)
           }
         }
 
-        else if(strcmp(line, "End Program Meta-Data Code.\n")==0)
+        else if(string_compare(line, "End Program Meta-Data Code.\n")==0)
         {
             break;
         }
@@ -70,11 +87,9 @@ struct metadata *read_metadata(const char *filename)
             {
                 string_token_left(line, left, ';');
                 current_node = create_metadata_node(left);
-                printf("%s\n", "1");
 
                 string_token_right(line, line, ';');
                 string_token_right(left, right, '.');
-                printf("%s\n", "2");
 
                 if ((current_node->letter != 'A' &&
                     current_node->letter != 'I' &&
@@ -82,26 +97,23 @@ struct metadata *read_metadata(const char *filename)
                     current_node->letter != 'O' &&
                     current_node->letter != 'P' &&
                     current_node->letter != 'S') ||
-                    (strcmp(current_node->command, "access") != 0 &&
-                    strcmp(current_node->command, "allocate") != 0 &&
-                    strcmp(current_node->command, "end") != 0 &&
-                    strcmp(current_node->command, "hard drive") != 0 &&
-                    strcmp(current_node->command, "keyboard") != 0 &&
-                    strcmp(current_node->command, "printer") != 0 &&
-                    strcmp(current_node->command, "run") != 0 &&
-                    strcmp(current_node->command, "start") != 0))
+                    (string_compare(current_node->command, "access") != 0 &&
+                    string_compare(current_node->command, "allocate") != 0 &&
+                    string_compare(current_node->command, "end") != 0 &&
+                    string_compare(current_node->command, "hard drive") != 0 &&
+                    string_compare(current_node->command, "keyboard") != 0 &&
+                    string_compare(current_node->command, "printer") != 0 &&
+                    string_compare(current_node->command, "run") != 0 &&
+                    string_compare(current_node->command, "start") != 0))
                     {
                         fprintf(stderr, "Error: Found incorrect value in metadata file.\n");
                         exit(1);
                     }
 
-                    printf("%s\n", "3");
-
                 push_metadata_node(meta_head, current_node);
 
-                printf("%s\n", "7");
 
-                if (strcmp(line, "") == 0 || strcmp(right, "") == 0)
+                if (string_compare(line, "") == 0 || string_compare(right, "") == 0)
                 {
                     break;
                 }
@@ -147,7 +159,7 @@ struct metadata *create_metadata_node(char *string)
         numstring[number_iter++] = string[number_count++];
     }
     numstring[number_iter] = '\0';
-    meta_node->number = atoi(numstring);
+    meta_node->number = string_to_integer(numstring);
 
     meta_node->nextnode = NULL;
 
