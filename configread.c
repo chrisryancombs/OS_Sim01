@@ -6,8 +6,8 @@ struct config read_config(const char *filename)
 {
   char line[MAX_LINE];
   int line_count = 0;
-  char *key;
-  char *val;
+  char key[MAX_LINE];
+  char val[MAX_LINE];
   struct config config_values;
 
   FILE *configfile = fopen(filename, "r");
@@ -32,9 +32,11 @@ struct config read_config(const char *filename)
       else
       {
         line_count++;
-        key = strtok(line, ":");
-        val = strtok(NULL, " ");
-
+        printf("%s\n", "asdasds");
+        string_token_left(line, key, ':');
+        printf("%s\n", "asdasd");
+        string_token_right(line, val, ':');
+        fprintf(stderr, "%s\n", "aaaa");
         if(strcmp(key, "Version/Phase") == 0)
         {
           config_values.version = atoi(val);
@@ -47,7 +49,7 @@ struct config read_config(const char *filename)
         {
           if (strcmp(val, "NONE") == 0)
           {
-            val = "FCFS-N";
+            strcpy(val,"FCFS-N");
           }
           config_values.cpu_scheduling_code = val;
         }
@@ -79,5 +81,16 @@ struct config read_config(const char *filename)
     }
   }
 
+  print_config(config_values);
   return config_values;
+}
+
+
+void print_config(struct config config_values)
+{
+    fprintf(stderr, "Config -------------\n");
+    fprintf(stderr, "verison: %d\n", config_values.version);
+    fprintf(stderr, "filepath: %s\n", config_values.filepath);
+    fprintf(stderr, "cpucode: %s\n", config_values.cpu_scheduling_code);
+
 }

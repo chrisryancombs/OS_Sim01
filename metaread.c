@@ -13,10 +13,9 @@ struct metadata *read_metadata(const char *filename)
     }
 
     // Create Parent and child node for linked list
-    struct metadata *meta_head = malloc(sizeof(struct metadata));;
-    struct metadata *current_node = malloc(sizeof(struct metadata));
-    current_node->command = malloc(MAX_STR);
-    meta_head = current_node;
+    struct metadata *meta_head = (struct metadata *)malloc(sizeof(struct metadata));
+    meta_head->command = malloc(MAX_STR);
+    meta_head->nextnode = NULL;
 
     char line[MAX_STR];
     int line_count = 0;
@@ -65,25 +64,17 @@ struct metadata *read_metadata(const char *filename)
         {
             char left[MAX_STR];
             char right[MAX_STR];
+            struct metadata *current_node;
 
             while(1)
             {
                 string_token_left(line, left, ';');
-                fprintf(stderr, "parsing: %s\n", left );
                 current_node = create_metadata_node(left);
-
-                fprintf(stderr, "Node-------\n");
-                fprintf(stderr, "letter: %c\n", current_node->letter);
-                fprintf(stderr, "command: %s\n", current_node->command);
-                fprintf(stderr, "number: %d\n", current_node->number);
+                printf("%s\n", "1");
 
                 string_token_right(line, line, ';');
                 string_token_right(left, right, '.');
-                if(strcmp(right, "") == 0)
-                {
-                    fprintf(stderr, "end of commands\n" );
-                    break;
-                }
+                printf("%s\n", "2");
 
                 if ((current_node->letter != 'A' &&
                     current_node->letter != 'I' &&
@@ -104,16 +95,14 @@ struct metadata *read_metadata(const char *filename)
                         exit(1);
                     }
 
+                    printf("%s\n", "3");
 
-                struct metadata *next_node = malloc(sizeof(struct metadata));
-                next_node->command = malloc(MAX_STR);
+                push_metadata_node(meta_head, current_node);
 
-                current_node->nextnode = next_node;
-                current_node = next_node;
+                printf("%s\n", "7");
 
-                if (strcmp(line, "") == 0)
+                if (strcmp(line, "") == 0 || strcmp(right, "") == 0)
                 {
-                    fprintf(stderr, "end\n" );
                     break;
                 }
 
@@ -124,53 +113,10 @@ struct metadata *read_metadata(const char *filename)
         }
 
     }
+    meta_head = meta_head->nextnode;
+    print_metadata(meta_head);
 
     return meta_head;
-}
-
-void string_token_left(char *string, char* substring, char delim)
-{
-    int count = 0;
-    while (string[count] != delim){
-        substring[count] = string[count];
-        count++;
-        if(string[count] == '\n')
-        {
-            return;
-        }
-    }
-    substring[count] = '\0';
-}
-
-void string_token_right(char *string, char* substring, char delim)
-{
-    int count = 0;
-    while (string[count] != delim)
-    {
-        count++;
-        if (string[count] == '\n')
-        {
-            return;
-        }
-    }
-    count++;
-
-    while (string[count] == ' ')
-    {
-        count++;
-    }
-    int end_count = count;
-    while(string[end_count] != '\n'){
-        end_count++;
-    }
-
-    int iter = count;
-    while (iter < end_count)
-    {
-        substring[iter - count] = string[iter];
-        iter++;
-    }
-    substring[iter - count] = '\0';
 }
 
 struct metadata *create_metadata_node(char *string)
@@ -187,37 +133,49 @@ struct metadata *create_metadata_node(char *string)
 
     int command_count = letter_count + 1;
     int command_iter = 0;
+    meta_node->command = malloc(MAX_STR);
     while (string[command_count] != ')')
     {
         meta_node->command[command_iter++] = string[command_count++];
     }
- // --------------------
+
     int number_count = command_count + 1;
     int number_iter = 0;
     char numstring[MAX_STR];
-    numstring[MAX_STR-2] = 0;
-    printf("NumC: %d, NumI: %d\nRest: %s\nNumString: %s\n", number_count, number_iter, string + number_count, numstring);
     while(string[number_count] != '\0')
     {
-        fprintf(stderr, "num: %c\n", string[number_count]);
         numstring[number_iter++] = string[number_count++];
     }
-    printf("iter: %d\n", number_iter);
     numstring[number_iter] = '\0';
-//-----------------
-    for (int i = 0; i< number_iter + 1; i++)
-    {
-        printf("N: %d\n", numstring[i]);
-    }
-    int i = 0;
-    while(numstring[i] != '\0')
-    {
-        printf("%c", numstring[i++]);
-    }
-    printf("\n");
-    printf("num: %s\n", numstring);
-    fprintf(stderr, "numstring: %s\n", numstring);
     meta_node->number = atoi(numstring);
-    exit(0);
+
+    meta_node->nextnode = NULL;
+
     return meta_node;
+}
+
+void push_metadata_node(struct metadata *head, struct metadata *node)
+{
+
+    struct metadata *current = head;
+    while (current->nextnode != NULL)
+    {
+        current = current->nextnode;
+    }
+    current->nextnode = node;
+}
+
+void print_metadata(struct metadata *head)
+{
+    struct metadata *current = head;
+    while(current->nextnode != NULL)
+    {
+        fprintf(stderr, "Node -------------\n");
+        fprintf(stderr, "letter: %c\n", current->letter);
+        fprintf(stderr, "command: %s\n", current->command);
+        fprintf(stderr, "number: %d\n", current->number);
+        current = current->nextnode;
+    }
+
+
 }
