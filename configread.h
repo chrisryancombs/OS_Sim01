@@ -15,27 +15,26 @@
 * @note None
 */
 
-
 // Header Files ///////////////////////////////////////////////////
 //
     #include "utilities.h"
 //
 // Data Structure Definitions (structs, enums, etc.)////////////////
 //
-    struct config
+    struct Config
     {
       int version;
       char *filepath;
-      char *cpu_scheduling_code;
-      int quantum_time;
-      int memory_available;
-      int processor_time;
-      int io_time;
-      char *log_to;
-      char *log_filepath;
+      char *cpuSchedulingCode;
+      int quantumTime;
+      int memoryAvailable;
+      int processorTime;
+      int ioTime;
+      char *logTo;
+      char *logFilepath;
     };
 //
 // Free Function Prototypes ///////////////////////////////////////
 //
-    struct config read_config(const char *filename);
-    void print_config(struct config config_values);
+    struct Config readConfig(const char *filename);
+    void printConfig(struct Config configValues);

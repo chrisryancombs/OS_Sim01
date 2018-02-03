@@ -15,8 +15,6 @@
 * @note None
 */
 
-
-
 // Header Files ///////////////////////////////////////////////////
 //
     #include <stdio.h>
@@ -26,18 +24,18 @@
 //
 // Data Structure Definitions (structs, enums, etc.)////////////////
 //
-    struct metadata
+    struct Metadata
     {
       char letter;
       char *command;
       int number;
-      struct metadata *nextnode;
+      struct Metadata *nextNode;
 
     };
 //
 // Free Function Prototypes ///////////////////////////////////////
 //
-    struct metadata *read_metadata(const char *filename);
-    struct metadata *create_metadata_node(char *string);
-    void push_metadata_node(struct metadata *head, struct metadata *node);
-    void print_metadata(struct metadata *head);
+    struct Metadata *readMetadata(const char *filename);
+    struct Metadata *createMetadataNode(char *string);
+    void pushMetadataNode(struct Metadata *head, struct Metadata *node);
+    void printMetadata(struct Metadata *head);

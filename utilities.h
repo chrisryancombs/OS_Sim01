@@ -20,17 +20,16 @@
  configuration. If the file is not found, the user will be notified
  and the program will exit.
 */
-//
+
 // Header Files ///////////////////////////////////////////////////
 //
-    #include <cstdio>
     #include <stdio.h>
     #include <stdlib.h>
 //
 // Free Function Prototypes ///////////////////////////////////////
 //
-    void string_token_left(char *string, char *substring, char delim);
-    void string_token_right(char *string, char *substring, char delim);
-    void string_copy(char *dest, char *from);
-    int string_compare(char *str1, char *str2);
-    int string_to_integer(char *string);
+    void stringTokenLeft(char *string, char *substring, char delim);
+    void stringTokenRight(char *string, char *substring, char delim);
+    void stringCopy(char *dest, char *from);
+    int stringCompare(char *str1, char *str2);
+    int stringToInteger(char *string);

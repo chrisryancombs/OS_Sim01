@@ -16,13 +16,22 @@
 *                utilities.h, utilities.c.
 */
 
-#include "configread.h"
-#include "metaread.h"
+// Header Files ///////////////////////////////////////////////////
+//
+    #include "configread.h"
+    #include "metaread.h"
 
-int main(int argc, char const *argv[])
-{
-  /// IF ARGC == 2
-  struct config config_values = read_config(argv[1]);
-  struct metadata *md = read_metadata(config_values.filepath);
+//
+// Main Function Implementation ///////////////////////////////////
+//
+    int main( int argc, char const *argv[] )
+    {
+      if( argc != 2 )
+      {
+          fprintf( stderr, "Incorrect number of arguments: %d\n", argc );
+          exit( 1 );
+      }
+      struct Config config_values = readConfig( argv[1] );
+      struct Metadata *metadata_values = readMetadata( config_values.filepath );
 
-}
+    }
