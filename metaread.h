@@ -1,3 +1,6 @@
+#ifndef METAREAD_H
+#define METAREAD_H
+
 // Header File Information /////////////////////////////////////
 /**
 * @file metaread.h
@@ -17,9 +20,6 @@
 
 // Header Files ///////////////////////////////////////////////////
 //
-    #include <stdio.h>
-    #include <stdlib.h>
-
     #include "utilities.h"
 //
 // Data Structure Definitions (structs, enums, etc.)////////////////
@@ -39,3 +39,6 @@
     struct Metadata *createMetadataNode(char *string);
     void pushMetadataNode(struct Metadata *head, struct Metadata *node);
     void printMetadata(struct Metadata *head);
+    void deleteMetadata(struct Metadata *head);
+
+#endif

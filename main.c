@@ -20,7 +20,7 @@
 //
     #include "configread.h"
     #include "metaread.h"
-
+    #include "processparse.h"
 //
 // Main Function Implementation ///////////////////////////////////
 //
@@ -31,7 +31,12 @@
           fprintf( stderr, "Incorrect number of arguments: %d\n", argc );
           exit( 1 );
       }
-      struct Config config_values = readConfig( argv[1] );
-      struct Metadata *metadata_values = readMetadata( config_values.filepath );
+      struct Config configValues = readConfig( argv[1] );
+      struct Metadata *metadataValues = readMetadata( configValues.filepath );
+
+      executeProcesses( configValues, metadataValues );
+
+      deleteConfig( configValues );
+      deleteMetadata( metadataValues );
 
     }

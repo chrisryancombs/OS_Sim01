@@ -120,11 +120,12 @@
                         stringCompare( currentNode->command, "end" ) != 0 &&
                         stringCompare( currentNode->command, "hard drive" ) != 0 &&
                         stringCompare( currentNode->command, "keyboard" ) != 0 &&
+                        stringCompare( currentNode->command, "monitor" ) != 0 &&
                         stringCompare( currentNode->command, "printer" ) != 0 &&
                         stringCompare( currentNode->command, "run" ) != 0 &&
                         stringCompare( currentNode->command, "start" ) != 0 )  )
                         {
-                            fprintf( stderr, "Error: Found incorrect value in metadata file.\n" );
+                            fprintf( stderr, "Error: Found incorrect value in metadata file.\n");
                             exit( 1 );
                         }
 
@@ -141,9 +142,11 @@
         }
 
         fclose(metadataFile);
-        metadataHead = metadataHead->nextNode;
-        // printMetadata( metadataHead );
-        return metadataHead;
+        struct Metadata *metadataReturn = metadataHead->nextNode;
+        free(metadataHead->command);
+        free(metadataHead);
+        // printMetadata( metadataReturn );
+        return metadataReturn;
     }
 //
 // Free Function Implementation ///////////////////////////////////
@@ -174,7 +177,7 @@
         count++;
         iter = 0;
         char numString[MAX_STR];
-        while( string[count] != '\0' )
+        while( string[count] != '\0' && string[count] != '.')
         {
             numString[iter++] = string[count++];
         }
@@ -203,12 +206,30 @@
     void printMetadata( struct Metadata *head )
     {
         struct Metadata *current = head;
-        while( current->nextNode != NULL )
+
+        while( current != NULL )
         {
             fprintf( stderr, "Node -------------\n" );
             fprintf( stderr, "letter: %c\n", current->letter );
             fprintf( stderr, "command: %s\n", current->command );
             fprintf( stderr, "number: %d\n", current->number );
             current = current->nextNode;
+        }
+    }
+
+//
+// Free Function Implementation ///////////////////////////////////
+//
+    void deleteMetadata( struct Metadata *head )
+    {
+        struct Metadata *current = head;
+        struct Metadata *nextNode;
+
+        while( current != NULL )
+        {
+            nextNode = current->nextNode;
+            free(current->command);
+            free(current);
+            current = nextNode;
         }
     }

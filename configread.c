@@ -88,19 +88,19 @@
                         }
                         stringCopy( configValues.cpuSchedulingCode, val );
                     }
-                    else if ( stringCompare( key, "Quantum Time ( cycles )" ) == 0 )
+                    else if ( stringCompare( key, "Quantum Time (cycles)" ) == 0 )
                     {
                         configValues.quantumTime = stringToInteger( val );
                     }
-                    else if ( stringCompare( key, "Memory Available ( KB )" ) == 0 )
+                    else if ( stringCompare( key, "Memory Available (KB)" ) == 0 )
                     {
                         configValues.memoryAvailable = stringToInteger( val );
                     }
-                    else if ( stringCompare( key, "Processor Cycle Time ( msec )" ) == 0 )
+                    else if ( stringCompare( key, "Processor Cycle Time (msec)" ) == 0 )
                     {
                         configValues.processorTime = stringToInteger( val );
                     }
-                    else if ( stringCompare( key, "I/O Cycle Time ( msec )" ) == 0 )
+                    else if ( stringCompare( key, "I/O Cycle Time (msec)" ) == 0 )
                     {
                         configValues.ioTime = stringToInteger( val );
                     }
@@ -113,6 +113,11 @@
                     {
                         configValues.logFilepath = malloc( MAX_LINE );
                         stringCopy( configValues.logFilepath, val );
+                    }
+                    else
+                    {
+                        printf("Error: Found incorrect value in config file: %s\n", line);
+                        exit( 1 );
                     }
                 }
             }
@@ -138,4 +143,15 @@
         printf( "I/O Cycle Time ( msec ):        %d\n", configValues.ioTime );
         printf( "Log To:                       %s\n", configValues.logTo );
         printf( "Log File Path:                %s\n", configValues.logFilepath );
+    }
+
+//
+// Free Function Implementation ///////////////////////////////////
+//
+    void deleteConfig( struct Config configValues )
+    {
+        free(configValues.filepath);
+        free(configValues.cpuSchedulingCode);
+        free(configValues.logTo);
+        free(configValues.logFilepath);
     }

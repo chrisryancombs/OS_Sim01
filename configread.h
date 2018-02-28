@@ -1,3 +1,6 @@
+#ifndef CONFIGREAD_H
+#define CONFIGREAD_H
+
 // Header File Information /////////////////////////////////////
 /**
 * @file configread.h
@@ -38,3 +41,6 @@
 //
     struct Config readConfig(const char *filename);
     void printConfig(struct Config configValues);
+    void deleteConfig(struct Config configValues);
+
+#endif
