@@ -217,3 +217,6 @@ void deleteMetadata( struct Metadata *head )
         current = nextNode;
     }
 }
+
+// Precompiler
+#endif
