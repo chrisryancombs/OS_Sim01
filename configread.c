@@ -1,4 +1,4 @@
-// Code Implementation File Information /////////////////////////////
+// Code Implementation File Information
 /**
 * @file configread.c
 *
@@ -14,16 +14,17 @@
 * @note Requires configread.h
 */
 
-// Header Files ///////////////////////////////////////////////////
-//
-    #include "configread.h"
-//
-// Global Constant Definitions ////////////////////////////////////
-//
-    const int MAX_LINE = 1024;
-//
-// Free Function Implementation ///////////////////////////////////
-//
+// Precompiler
+#ifndef CONFIGREAD_C
+#define CONFIGREAD_C
+
+// Header Files
+#include "configread.h"
+
+// Global Constant Definitions
+const int MAX_LINE = 1024;
+
+// Free Function Implementation
 /**
 * @brief readConfig Parses a config file for keys and values
 *
@@ -35,29 +36,28 @@
 * @post struct Config contains all values parsed for in config file
 *
 */
-    struct Config readConfig( const char *filename )
-    {
-        char line[MAX_LINE];
-        int lineCount = 0;
-        char key[MAX_LINE];
-        char val[MAX_LINE];
-        struct Config configValues;
+struct Config readConfig( const char *filename )
+{
+    char line[MAX_LINE];
+    int lineCount = 0;
+    char key[MAX_LINE];
+    char val[MAX_LINE];
+    struct Config configValues;
 
-        FILE *configFile = fopen( filename, "r" );
-        if( configFile == NULL )
+    FILE *configFile = fopen( filename, "r" );
+    if( configFile == NULL )
+    {
+        fprintf( stderr, "Error: Unable to open config file.\n"  );
+        exit(1);
+    }
+    else
+    {
+        while( 1 )
         {
-            fprintf( stderr, "Error: Unable to open config file.\n"  );
-            exit(1);
-        }
-        else
-        {
-            while( 1 )
+            fgets( line, MAX_LINE, configFile );
+            if( lineCount == 0  && stringCompare( line, "Start Simulator Configuration File\n" ) == 0 )
             {
-                fgets( line, MAX_LINE, configFile );
-                if( lineCount == 0  && stringCompare(
-                            line, "Start Simulator Configuration File\n" ) == 0 )
-                {
-                    lineCount++;
+                lineCount++;
                     continue;
                 }
                 else if( stringCompare(
@@ -128,30 +128,29 @@
         return configValues;
     }
 
-//
-// Free Function Implementation ///////////////////////////////////
-//
-    void printConfig( struct Config configValues )
-    {
-        printf( "Config -------------\n" );
-        printf( "Version/Path:                 %d\n", configValues.version );
-        printf( "File Path:                    %s\n", configValues.filepath );
-        printf( "CPU Scheduling Code:          %s\n", configValues.cpuSchedulingCode );
-        printf( "Quantum Time ( cycles ):        %d\n", configValues.quantumTime );
-        printf( "Memory Available ( KB ):        %d\n", configValues.memoryAvailable );
-        printf( "Processor Cycle Time ( msec ):  %d\n", configValues.processorTime );
-        printf( "I/O Cycle Time ( msec ):        %d\n", configValues.ioTime );
-        printf( "Log To:                       %s\n", configValues.logTo );
-        printf( "Log File Path:                %s\n", configValues.logFilepath );
-    }
+// Free Function Implementation
+void printConfig( struct Config configValues )
+{
+    printf( "Config -------------\n" );
+    printf( "Version/Path:                   %d\n", configValues.version );
+    printf( "File Path:                      %s\n", configValues.filepath );
+    printf( "CPU Scheduling Code:            %s\n", configValues.cpuSchedulingCode );
+    printf( "Quantum Time ( cycles ):        %d\n", configValues.quantumTime );
+    printf( "Memory Available ( KB ):        %d\n", configValues.memoryAvailable );
+    printf( "Processor Cycle Time ( msec ):  %d\n", configValues.processorTime );
+    printf( "I/O Cycle Time ( msec ):        %d\n", configValues.ioTime );
+    printf( "Log To:                         %s\n", configValues.logTo );
+    printf( "Log File Path:                  %s\n", configValues.logFilepath );
+}
 
-//
-// Free Function Implementation ///////////////////////////////////
-//
-    void deleteConfig( struct Config configValues )
-    {
-        free(configValues.filepath);
-        free(configValues.cpuSchedulingCode);
-        free(configValues.logTo);
-        free(configValues.logFilepath);
-    }
+// Free Function Implementation
+void deleteConfig( struct Config configValues )
+{
+    free(configValues.filepath);
+    free(configValues.cpuSchedulingCode);
+    free(configValues.logTo);
+    free(configValues.logFilepath);
+}
+
+// Precompiler
+#endif

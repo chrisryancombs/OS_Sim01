@@ -6,7 +6,6 @@
 *
 * @details Allows for ingestion of Config and Metadata files
 *
-*
 * @version 1.00
 * C.S. Student (2 February 2018)
 * Initial development and testing
@@ -16,27 +15,32 @@
 *                utilities.h, utilities.c.
 */
 
+// Precompiler  ///////////////////////////////////////////////////
+#ifndef MAIN_C
+#define MAIN_C
+
 // Header Files ///////////////////////////////////////////////////
-//
-    #include "configread.h"
-    #include "metaread.h"
-    #include "processparse.h"
-//
+#include "configread.h"
+#include "metaread.h"
+#include "processparse.h"
+
 // Main Function Implementation ///////////////////////////////////
-//
-    int main( int argc, char const *argv[] )
+int main( int argc, char const *argv[] )
+{
+    if( argc != 2 )
     {
-      if( argc != 2 )
-      {
-          fprintf( stderr, "Incorrect number of arguments: %d\n", argc );
-          exit( 1 );
-      }
-      struct Config configValues = readConfig( argv[1] );
-      struct Metadata *metadataValues = readMetadata( configValues.filepath );
-
-      executeProcesses( configValues, metadataValues );
-
-      deleteConfig( configValues );
-      deleteMetadata( metadataValues );
-
+        fprintf( stderr, "Incorrect number of arguments: %d\n", argc );
+        exit( 1 );
     }
+    struct Config configValues = readConfig( argv[1] );
+    struct Metadata *metadataValues = readMetadata( configValues.filepath );
+
+    executeProcesses( configValues, metadataValues );
+
+    deleteConfig( configValues );
+    deleteMetadata( metadataValues );
+
+}
+
+// Precompiler  ///////////////////////////////////////////////////
+#endif

@@ -1,0 +1,28 @@
+CC = gcc
+DEBUG = -g
+CFLAGS = -Wall -std=c99 -pedantic -c $(DEBUG)
+LFLAGS = -Wall -std=c99 -pedantic -pthread $(DEBUG)
+
+sim03: main.o configread.o metaread.o processparse.o simtimer.o utilities.o
+	$(CC) $(LFLAGS) main.o configread.o metaread.o processparse.o simtimer.o utilities.o -o sim03
+
+main.o: main.c
+    $(CC) $(CFLAGS) main.c
+
+configread.o: configread.c configread.h
+    $(CC) $(CFLAGS) configread.c
+
+metaread.o: metaread.c metaread.h
+    $(CC) $(CFLAGS) metaread.c
+
+processparse.o: processparse.c processparse.h
+    $(CC) $(CFLAGS) processparse.c
+
+simtimer.o: simtimer.c simtimer.h
+    $(CC) $(CFLAGS) simtimer.c
+
+utilities.o: utilities.c utilities.h
+    $(CC) $(CFLAGS) utilities.c
+
+clean:
+	rm -rf *.o ./sim03

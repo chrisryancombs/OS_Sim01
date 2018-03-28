@@ -1,6 +1,3 @@
-#ifndef METAREAD_H
-#define METAREAD_H
-
 // Header File Information /////////////////////////////////////
 /**
 * @file metaread.h
@@ -18,27 +15,28 @@
 * @note None
 */
 
-// Header Files ///////////////////////////////////////////////////
-//
-    #include "utilities.h"
-//
-// Data Structure Definitions (structs, enums, etc.)////////////////
-//
-    struct Metadata
-    {
-      char letter;
-      char *command;
-      int number;
-      struct Metadata *nextNode;
+// Precompiler
+#ifndef METAREAD_H
+#define METAREAD_H
 
-    };
-//
-// Free Function Prototypes ///////////////////////////////////////
-//
-    struct Metadata *readMetadata(const char *filename);
-    struct Metadata *createMetadataNode(char *string);
-    void pushMetadataNode(struct Metadata *head, struct Metadata *node);
-    void printMetadata(struct Metadata *head);
-    void deleteMetadata(struct Metadata *head);
+// Header Files
+#include "utilities.h"
+
+// Data Structure Definitions
+struct Metadata
+{
+  char letter;
+  char *command;
+  int number;
+  struct Metadata *nextNode;
+
+};
+
+// Free Function Prototypes
+struct Metadata *readMetadata(const char *filename);
+struct Metadata *createMetadataNode(char *string);
+void pushMetadataNode(struct Metadata *head, struct Metadata *node);
+void printMetadata(struct Metadata *head);
+void deleteMetadata(struct Metadata *head);
 
 #endif

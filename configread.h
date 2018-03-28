@@ -1,6 +1,3 @@
-#ifndef CONFIGREAD_H
-#define CONFIGREAD_H
-
 // Header File Information /////////////////////////////////////
 /**
 * @file configread.h
@@ -18,29 +15,31 @@
 * @note None
 */
 
-// Header Files ///////////////////////////////////////////////////
-//
-    #include "utilities.h"
-//
-// Data Structure Definitions (structs, enums, etc.)////////////////
-//
-    struct Config
-    {
-      int version;
-      char *filepath;
-      char *cpuSchedulingCode;
-      int quantumTime;
-      int memoryAvailable;
-      int processorTime;
-      int ioTime;
-      char *logTo;
-      char *logFilepath;
-    };
-//
-// Free Function Prototypes ///////////////////////////////////////
-//
-    struct Config readConfig(const char *filename);
-    void printConfig(struct Config configValues);
-    void deleteConfig(struct Config configValues);
+// Precompiler
+#ifndef CONFIGREAD_H
+#define CONFIGREAD_H
 
+// Header Files
+#include "utilities.h"
+
+// Data Structure Definitions
+struct Config
+{
+  int version;
+  char *filepath;
+  char *cpuSchedulingCode;
+  int quantumTime;
+  int memoryAvailable;
+  int processorTime;
+  int ioTime;
+  char *logTo;
+  char *logFilepath;
+};
+
+// Free Function Prototypes
+struct Config readConfig(const char *filename);
+void printConfig(struct Config configValues);
+void deleteConfig(struct Config configValues);
+
+// Precompiler
 #endif

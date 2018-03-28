@@ -22,14 +22,12 @@
 */
 
 // Header Files ///////////////////////////////////////////////////
-//
-    #include <stdio.h>
-    #include <stdlib.h>
-//
+#include <stdio.h>
+#include <stdlib.h>
+
 // Free Function Prototypes ///////////////////////////////////////
-//
-    void stringTokenLeft(char *string, char *substring, char delim);
-    void stringTokenRight(char *string, char *substring, char delim);
-    void stringCopy(char *dest, char *from);
-    int stringCompare(char *str1, char *str2);
-    int stringToInteger(char *string);
+void stringTokenLeft(char *string, char *substring, char delim);
+void stringTokenRight(char *string, char *substring, char delim);
+void stringCopy(char *dest, char *from);
+int stringCompare(char *str1, char *str2);
+int stringToInteger(char *string);
