@@ -7,8 +7,8 @@
 * @details Implements all functions of the processparse utilities
 *
 *
-* @version 1.00
-* C.S. Student ( 2 February 2018 )
+* @version 1.03
+* C.S. Student ( 6 April 2018 )
 * Initial development and testing of processparse code
 *
 * @note Requires processparse.h
@@ -24,20 +24,10 @@
 // Global Constant Definitions
 const int STR_MAX = 1024;
 
-// Free Function Implementation
-/**
-* @brief constructPCB creates a PCB Linked list from a metadata linked list
-*
-* @details Reads in a metadata linked list and stores each node
-* (if necessary) in a correspinding PCB Node.
-*
-* @pre struct Metadata contains a metadata linked list
-*
-* @post struct PCB contains all values parsed for in metadata llist
-* as well as the next start node from the metadata linked list
-*
-*/
-
+// constructPCB - creates a PCB Linked list from a metadata linked list
+// input: Metadata* metadata -  contains a metadata linked list
+// output: PCB return - contains all values parsed for in metadata llist
+//         as well as the next start node from the metadata linked list
 struct PCB *constructPCB( struct Metadata *metadata )
 {
     int index = 0;
@@ -65,6 +55,19 @@ struct PCB *constructPCB( struct Metadata *metadata )
     return PCBHead;
 }
 
+// runThread - spawns a thread and runs for the given amount of time
+// input: int oper - idk
+// input: int time - time to wait on a process
+void *runThread( void  *arg )
+{
+    int runTime = *( (int *) arg ); // evil
+    runTimer( runTime );
+    pthread_exit( 0 );
+}
+
+// executeProcesses - iterates through and runs all processes in a PCB
+// input: Config config - data read from config file specified when run
+// input Metadata metadata - data read from metadata file listed in config
 void executeProcesses( struct Config config, struct Metadata *metadata )
 {
     // Open file and allocate
@@ -120,6 +123,8 @@ void executeProcesses( struct Config config, struct Metadata *metadata )
     sprintf( tempString, "Time:  %s, OS: All proccesses now set in Ready state\n", time );
     logMessage( tempString, toFile, toConsole, outFile );
 
+    // Run processes
+    pthread_t thread;
     currentPCB = PCBHead;
     while ( currentPCB->process != NULL )
     {
@@ -131,36 +136,48 @@ void executeProcesses( struct Config config, struct Metadata *metadata )
         sprintf( tempString, "Time:  %s, OS: Process %d set in Running state\n", time, currentPCB->index );
         logMessage( tempString, toFile, toConsole, outFile );
 
+        int *arg = malloc(sizeof(*arg));
         struct Metadata *currentOp = currentPCB->process;
         while( stringCompare( currentOp->command, "end" ) != 0 )
         {
             switch ( currentOp->letter )
             {
-                accessTimer( LAP_TIMER, time );
                 case ( 'M' ):
+                    accessTimer( LAP_TIMER, time );
                     sprintf( tempString, "Time:  %s, Process %d, Memory management allocate action start\n", time, currentPCB->index );
-                    runTimer(100);
+                    *arg = 100;
+                    pthread_create(&thread, NULL, runThread, arg);
+                    pthread_join(thread, NULL);
                     accessTimer( LAP_TIMER, time );
                     sprintf( tempString2, "Time:  %s, Process %d, Memory management allocate action end\n", time, currentPCB->index );
                     break;
 
                 case ( 'I' ):
+                    accessTimer( LAP_TIMER, time );
                     sprintf( tempString, "Time:  %s, Process %d, %s input start\n", time, currentPCB->index, currentOp->command );
-                    runTimer( config.ioTime );
+                    *arg = config.ioTime;
+                    pthread_create(&thread, NULL, runThread, arg );
+                    pthread_join(thread, NULL);
                     accessTimer( LAP_TIMER, time );
                     sprintf( tempString2, "Time:  %s, Process %d, %s input end\n", time, currentPCB->index, currentOp->command );
                     break;
 
                 case ( 'O' ):
+                    accessTimer( LAP_TIMER, time );
                     sprintf( tempString, "Time:  %s, Process %d, %s output start\n", time, currentPCB->index, currentOp->command );
-                    runTimer( config.ioTime );
+                    *arg = config.ioTime;
+                    pthread_create(&thread, NULL, runThread, arg );
+                    pthread_join(thread, NULL);
                     accessTimer( LAP_TIMER, time );
                     sprintf( tempString2, "Time:  %s, Process %d, %s output end\n", time, currentPCB->index, currentOp->command );
                     break;
 
                 case ( 'P' ):
+                    accessTimer( LAP_TIMER, time );
                     sprintf( tempString, "Time:  %s, Run operation start\n", time );
-                    runTimer( config.processorTime );
+                    *arg = config.processorTime;
+                    pthread_create(&thread, NULL, runThread, arg );
+                    pthread_join(thread, NULL);
                     accessTimer( LAP_TIMER, time );
                     sprintf( tempString2, "Time:  %s, Run operation end\n", time );
                     break;

@@ -25,6 +25,8 @@
 #include "configread.h"
 #include "simtimer.h"
 
+#include <pthread.h>
+
 // Data Structure Definitions
 struct PCB
 {
@@ -40,5 +42,6 @@ void executeProcesses( struct Config config, struct Metadata *metadata );
 void deletePCB( struct PCB *head );
 void printPCB( struct PCB *head );
 void logMessage( char *message, int toFile, int toConsole, FILE *file);
+void *runThread( void *time );
 
 #endif
