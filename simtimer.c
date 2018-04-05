@@ -123,27 +123,7 @@ double accessTimer( int controlCode, char *timeStr )
               {
                fpTime = 0.000000000;
               }
-           break;
-
-       case GET_TIME:
-          if( running == 1 )
-             {
-              gettimeofday( &endData, NULL );
-
-              endSec = endData.tv_sec;
-              endUSec = endData.tv_usec;
-
-              fpTime = processTime( startSec, endSec,
-                                                startUSec, endUSec, timeStr );
-             }
-
-          // assume timer not running
-          else
-             {
-              fpTime = 0.000000000;
-             }
-          break;
-       }
+           break;       }
 
     return fpTime;
    }

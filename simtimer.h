@@ -28,7 +28,7 @@
 
 // Global Constants  //////////////////////////////////////////////////////////
 
-enum TIMER_CTRL_CODES { ZERO_TIMER, LAP_TIMER, STOP_TIMER, GET_TIME };
+enum TIMER_CTRL_CODES { ZERO_TIMER, LAP_TIMER, STOP_TIMER };
 
 extern const char RADIX_POINT;
 extern const char SPACE;

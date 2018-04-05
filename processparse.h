@@ -34,10 +34,11 @@ struct PCB
     struct PCB *nextProcess;
 };
 
-// Free Function Prototypes 
+// Free Function Prototypes
 struct PCB *constructPCB( struct Metadata *metadata );
 void executeProcesses( struct Config config, struct Metadata *metadata );
 void deletePCB( struct PCB *head );
 void printPCB( struct PCB *head );
+void logMessage( char *message, int toFile, int toConsole, FILE *file);
 
 #endif
