@@ -160,7 +160,7 @@ struct Metadata *readMetadata( const char *filename, int ioTime, int processorTi
     struct Metadata *metadataReturn = metadataHead->nextNode;
     free(metadataHead->command);
     free(metadataHead);
-    // printMetadata( metadataReturn );
+    printMetadata( metadataReturn );
     return metadataReturn;
 }
 

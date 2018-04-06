@@ -28,7 +28,7 @@ const int STR_MAX = 1024;
 // input: Metadata* metadata -  contains a metadata linked list
 // output: PCB return - contains all values parsed for in metadata llist
 //         as well as the next start node from the metadata linked list
-struct PCB *constructPCB( struct Metadata *metadata )
+struct PCB *constructPCB( struct Metadata *metadata, struct Config config )
 {
     int index = 0;
     struct Metadata *currentMD = metadata;
@@ -41,6 +41,7 @@ struct PCB *constructPCB( struct Metadata *metadata )
         {
             currentPCB->index = index++;
             currentPCB->process = currentMD;
+            currentPCB->time = calcProcessTime( currentPCB );
             currentPCB->state = 0;
 
             currentPCB->nextProcess = malloc( sizeof( struct PCB ) );
@@ -49,23 +50,67 @@ struct PCB *constructPCB( struct Metadata *metadata )
         currentMD = currentMD->nextNode;
     }
     currentPCB = NULL;
-    free(currentPCB);
-    // printPCB(PCBHead);
+    free( currentPCB );
 
+    if( stringCompare(config.cpuSchedulingCode, "SJF-N") == 0 )
+    {
+        PCBHead = bubbleSort(PCBHead);
+    }
+
+    printPCB(PCBHead);
     return PCBHead;
 }
 
-int calcProcessTime( struct PCB *pcb, struct Config config )
+struct PCB *bubbleSort( struct PCB *firstNode )
+{
+    int tempIndex;
+    int tempTime;
+    struct Metadata *tempMetadata;
+
+    struct PCB *currentNode = NULL;
+    int cont = 1;
+    while ( cont )
+    {
+        cont = 0;
+        currentNode = firstNode;
+
+        while( currentNode->nextProcess->process != NULL)
+        {
+            if( currentNode->time > currentNode->nextProcess->time )
+            {
+                //swap
+                tempIndex = currentNode->index;
+                tempMetadata = currentNode->process;
+                tempTime = currentNode->time;
+
+                currentNode->index = currentNode->nextProcess->index;
+                currentNode->process = currentNode->nextProcess->process;
+                currentNode->time = currentNode->nextProcess->time;
+
+                currentNode->nextProcess->index = tempIndex;
+                currentNode->nextProcess->process = tempMetadata;
+                currentNode->nextProcess->time = tempTime;
+                cont = 1;
+            }
+            currentNode = currentNode->nextProcess;
+        }
+
+    }
+    // printPCB(firstNode->nextProcess);
+    return firstNode->nextProcess;
+}
+
+
+
+int calcProcessTime( struct PCB *pcb )
 {
     struct Metadata *current = pcb->process;
-    struct Metadata *next;
     int processTime = 0;
 
     while( stringCompare( current->command, "end" ) != 0 )
     {
-        next = current->nextNode;
         processTime += current->time;
-        current = next;
+        current = current->nextNode;
     }
     return processTime;
 }
@@ -85,12 +130,6 @@ void *runThread( void  *arg )
 // input Metadata metadata - data read from metadata file listed in config
 void executeProcesses( struct Config config, struct Metadata *metadata )
 {
-    int scheduling = FCFS;
-    if( stringCompare(config.cpuSchedulingCode, "SJF-N") == 0 )
-    {
-        scheduling = SJF;
-    }
-
     // Set bools for printing options
     int toConsole = 0;
     int toFile = 0;
@@ -109,11 +148,15 @@ void executeProcesses( struct Config config, struct Metadata *metadata )
     }
 
     // File Header
-    FILE *outFile = fopen( config.logFilepath, "w" );
+    FILE *outFile = NULL;
+    if( toFile )
+    {
+        outFile = fopen( config.logFilepath, "w" );
+    }
     writeHeader( config, toFile, toConsole, outFile );
 
     // Contruct Schedule from metadata linked list
-    struct PCB *PCBHead = constructPCB( metadata );
+    struct PCB *PCBHead = constructPCB( metadata, config );
     struct PCB *currentPCB = PCBHead;
 
     char *tempString = malloc( STR_MAX );
@@ -139,26 +182,20 @@ void executeProcesses( struct Config config, struct Metadata *metadata )
     struct Metadata *currentOp;
     while ( currentPCB->process != NULL )
     {
-        if( scheduling == SJF )
-        {
-            printf("%s\n", "ay");
-        }
-        else // Default is FCFS
-        {
-            accessTimer( LAP_TIMER, time );
-            sprintf( tempString, "Time:  %s, OS: FCFS-N Strategy selects Process %d\n", time, currentPCB->index );
-            logMessage( tempString, toFile, toConsole, outFile );
+        accessTimer( LAP_TIMER, time );
+        sprintf( tempString, "Time:  %s, OS: %s Strategy selects Process %d with time: %d mSec\n", time, config.cpuSchedulingCode, currentPCB->index, currentPCB->time );
+        logMessage( tempString, toFile, toConsole, outFile );
 
-            accessTimer( LAP_TIMER, time);
-            sprintf( tempString, "Time:  %s, OS: Process %d set in Running state\n", time, currentPCB->index );
-            logMessage( tempString, toFile, toConsole, outFile );
-            currentOp = currentPCB->process;
-        }
+        accessTimer( LAP_TIMER, time);
+        sprintf( tempString, "Time:  %s, OS: Process %d set in Running state\n", time, currentPCB->index );
+        logMessage( tempString, toFile, toConsole, outFile );
+        currentOp = currentPCB->process;
 
+        // Iterate through metadata nodes in process
         int *arg = malloc( sizeof( *arg ) );
         while( stringCompare( currentOp->command, "end" ) != 0 )
         {
-            // Prepare output Strings
+            // Prepare output Strings, end time will be prepended after thread runs
             accessTimer( LAP_TIMER, time );
             switch( currentOp->letter )
             {
@@ -213,13 +250,21 @@ void executeProcesses( struct Config config, struct Metadata *metadata )
     logMessage( tempString, toFile, toConsole, outFile );
 
     deletePCB( PCBHead );
-    fclose(outFile);
+
+    if( toFile ){
+        fclose(outFile);
+    }
 
     free( tempString );
     free( tempString2 );
     free( time );
 }
 
+// writeHeader - writes simulation header to file, only used once, but looks NICER
+// input: Config config - config file use for output options
+// input: int toFile - bool whether to print to file
+// input: into toConsole - bool whether to print to to console
+// input: FILE *outFile - possible file to print to
 void writeHeader(struct Config config, int toFile, int toConsole, FILE *outFile)
 {
     char *tempString = malloc(STR_MAX);
@@ -255,6 +300,7 @@ void printPCB( struct PCB *head )
     {
         fprintf( stderr, "Process -------------\n" );
         fprintf( stderr, "index: %d\n", current->index );
+        fprintf( stderr, "time: %d\n", current->time );
         fprintf( stderr, "state: %d\n", current->state );
         fprintf( stderr, "letter: %c\n", current->process->letter );
         fprintf( stderr, "command: %s\n", current->process->command );
@@ -269,7 +315,7 @@ void deletePCB( struct PCB *head )
     struct PCB *current = head;
     struct PCB *nextNode;
 
-    while( current != NULL )
+    while( current->process != NULL )
     {
         nextNode = current->nextProcess;
         free( current );

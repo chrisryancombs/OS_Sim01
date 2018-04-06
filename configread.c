@@ -84,7 +84,7 @@ struct Config readConfig( const char *filename )
                         configValues.cpuSchedulingCode = malloc( MAX_LINE );
                         if ( stringCompare( val, "NONE" ) == 0 )
                         {
-                            stringCopy( val,"FCFS-N" );
+                            sprintf( val, "%s", "FCFS-N" );
                         }
                         stringCopy( configValues.cpuSchedulingCode, val );
                     }

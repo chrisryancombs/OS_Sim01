@@ -31,6 +31,7 @@
 struct PCB
 {
     int index;
+    int time;
     struct Metadata *process;
     enum { NEW, READY, RUNNING, BLOCKED, EXIT } state;
     struct PCB *nextProcess;
@@ -39,7 +40,9 @@ struct PCB
 enum{ FCFS, SJF } scheduling;
 
 // Free Function Prototypes
-struct PCB *constructPCB( struct Metadata *metadata );
+struct PCB *constructPCB( struct Metadata *metadata, struct Config config );
+struct PCB *bubbleSort( struct PCB *firstNode );
+int calcProcessTime( struct PCB *pcb );
 void executeProcesses( struct Config config, struct Metadata *metadata );
 void deletePCB( struct PCB *head );
 void printPCB( struct PCB *head );
