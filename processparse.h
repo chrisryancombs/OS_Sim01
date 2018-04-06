@@ -56,8 +56,10 @@ int calcProcessTime( struct PCB *pcb );
 void executeProcesses( struct Config config, struct Metadata *metadata );
 void deletePCB( struct PCB *head );
 void printPCB( struct PCB *head );
+
 void logMessage( char *message, int toFile, int toConsole, FILE *file);
 void *runThread( void *time );
 void writeHeader(struct Config config, int toFile, int toConsole, FILE *outFile);
+
 
 #endif

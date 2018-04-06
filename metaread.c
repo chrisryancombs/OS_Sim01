@@ -180,7 +180,6 @@ struct Metadata *createMetadataNode( char *string )
     metadataNode->letter = string[count - 1];
 
     count++;
-    metadataNode->command = malloc( MAX_STR );
     while( string[count] != ')' )
     {
         metadataNode->command[iter] = string[count];

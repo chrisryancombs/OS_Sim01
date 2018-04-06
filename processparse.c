@@ -80,7 +80,7 @@ struct PCB *bubbleSort( struct PCB *firstNode )
         cont = 0;
         currentNode = firstNode;
 
-        while( currentNode->nextProcess->process != NULL)
+        while( currentNode->nextProcess != NULL && currentNode->nextProcess->process != NULL)
         {
             if( currentNode->time > currentNode->nextProcess->time )
             {
@@ -103,7 +103,9 @@ struct PCB *bubbleSort( struct PCB *firstNode )
 
     }
     // printPCB(firstNode->nextProcess);
-    return firstNode->nextProcess;
+    struct PCB *ret = firstNode->nextProcess;
+    free( firstNode );
+    return ret;
 }
 
 
@@ -200,7 +202,7 @@ void executeProcesses( struct Config config, struct Metadata *metadata )
     logMessage( tempString, toFile, toConsole, outFile );
 
     // Set all Processes to Ready
-    while ( currentPCB->process != NULL )
+    while ( currentPCB != NULL && currentPCB->process != NULL )
     {
         currentPCB->state = READY;
         currentPCB = currentPCB->nextProcess;
@@ -221,7 +223,7 @@ void executeProcesses( struct Config config, struct Metadata *metadata )
     pthread_t thread;
     currentPCB = PCBHead;
     struct Metadata *currentOp;
-    while ( currentPCB->process != NULL )
+    while ( currentPCB != NULL && currentPCB->process != NULL )
     {
         accessTimer( LAP_TIMER, time );
         sprintf( tempString, "Time:  %s, OS: %s Strategy selects Process %d with time: %d mSec\n", time, config.cpuSchedulingCode, currentPCB->index, currentPCB->time );
@@ -324,6 +326,7 @@ void executeProcesses( struct Config config, struct Metadata *metadata )
     free( tempString );
     free( tempString2 );
     free( time );
+    free( mmu );
 }
 
 // writeHeader - writes simulation header to file, only used once, but looks NICER
@@ -362,7 +365,7 @@ void writeHeader(struct Config config, int toFile, int toConsole, FILE *outFile)
 void printPCB( struct PCB *head )
 {
     struct PCB *current = head;
-    while( current->process != NULL )
+    while( current != NULL && current->process != NULL )
     {
         fprintf( stderr, "Process -------------\n" );
         fprintf( stderr, "index: %d\n", current->index );
@@ -381,7 +384,7 @@ void deletePCB( struct PCB *head )
     struct PCB *current = head;
     struct PCB *nextNode;
 
-    while( current->process != NULL )
+    while( current != NULL && current->process != NULL )
     {
         nextNode = current->nextProcess;
         free( current );

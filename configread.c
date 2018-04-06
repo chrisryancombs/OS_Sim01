@@ -43,6 +43,11 @@ struct Config readConfig( const char *filename )
     char key[MAX_LINE];
     char val[MAX_LINE];
     struct Config configValues;
+    configValues.filepath = "";
+    configValues.cpuSchedulingCode = "";
+    configValues.logTo = "";
+    configValues.logFilepath = "";
+
 
     FILE *configFile = fopen( filename, "r" );
     if( configFile == NULL )
