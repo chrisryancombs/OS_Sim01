@@ -37,6 +37,16 @@ struct PCB
     struct PCB *nextProcess;
 };
 
+struct MMU
+{
+    int maxMem;
+    int failure;
+    int segment;
+    int base;
+    int request;
+    struct Metadata *process;
+};
+
 enum{ FCFS, SJF } scheduling;
 
 // Free Function Prototypes

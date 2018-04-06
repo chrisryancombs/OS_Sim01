@@ -61,6 +61,9 @@ struct PCB *constructPCB( struct Metadata *metadata, struct Config config )
     return PCBHead;
 }
 
+// bubbleSort - sorts a PCB from least to greatest processing time
+// input: PCB *firstNode: Head of PCB to be Sorted
+// output: PCB *return: Sorted PCB, for use with SJF-N
 struct PCB *bubbleSort( struct PCB *firstNode )
 {
     int tempIndex;
@@ -69,7 +72,7 @@ struct PCB *bubbleSort( struct PCB *firstNode )
 
     struct PCB *currentNode = NULL;
     int cont = 1;
-    while ( cont )
+    while ( cont ) // Only continue if swaps are necessary
     {
         cont = 0;
         currentNode = firstNode;
@@ -78,7 +81,7 @@ struct PCB *bubbleSort( struct PCB *firstNode )
         {
             if( currentNode->time > currentNode->nextProcess->time )
             {
-                //swap
+                //create temps and swap
                 tempIndex = currentNode->index;
                 tempMetadata = currentNode->process;
                 tempTime = currentNode->time;
@@ -101,7 +104,9 @@ struct PCB *bubbleSort( struct PCB *firstNode )
 }
 
 
-
+// calcProcessTime - sums of total processing time for a Process
+// input: PCB *pcb - Head of Process
+// output: int return - processing time sum
 int calcProcessTime( struct PCB *pcb )
 {
     struct Metadata *current = pcb->process;
@@ -116,12 +121,42 @@ int calcProcessTime( struct PCB *pcb )
 }
 
 // runThread - spawns a thread and runs for the given amount of time
-// input: int oper - idk
-// input: int time - time to wait on a process
+// input: void *arg - pointer to int that will be cast as run time
 void *runThread( void  *arg )
 {
     int runTime = *( (int *) arg ); // evil
     runTimer( runTime );
+    pthread_exit( 0 );
+}
+
+// memManage - spawns a thread and tried to manage memory
+// input: void *arg - pointer to the MMU holding the process
+void *memManage( void  *arg )
+{
+    struct MMU *mmu = ( (struct MMU *) arg );
+    if( stringCompare( mmu->process->command , "allocate" ) == 0)
+    {
+        mmu->request = mmu->process->number % 1000;
+        int remain = mmu->process->number /= 1000;
+        mmu->base = remain % 1000;
+        mmu->segment = remain /= 1000;
+
+        if( (mmu->base + mmu->segment) > mmu->maxMem)
+        {
+            mmu->failure = 1;
+        }
+    }
+    else // "access"
+    {
+        int request = mmu->process->number % 1000;
+        int remain = mmu->process->number /= 1000;
+        int segment = remain /= 1000;
+
+        if( (request + segment) > mmu->request + (mmu->segment) )
+        {
+            mmu->failure = 1;
+        }
+    }
     pthread_exit( 0 );
 }
 
@@ -176,6 +211,14 @@ void executeProcesses( struct Config config, struct Metadata *metadata )
     sprintf( tempString, "Time:  %s, OS: All proccesses now set in Ready state\n", time );
     logMessage( tempString, toFile, toConsole, outFile );
 
+    // Initialize MMU
+    struct MMU *mmu = malloc( sizeof( struct MMU ) );
+    mmu->maxMem = config.memoryAvailable;
+    mmu->segment = 0;
+    mmu->request = 0;
+    mmu->failure = 0;
+    mmu->process = NULL;
+
     // Run processes
     pthread_t thread;
     currentPCB = PCBHead;
@@ -200,8 +243,8 @@ void executeProcesses( struct Config config, struct Metadata *metadata )
             switch( currentOp->letter )
             {
                 case ( 'M' ):
-                    sprintf( tempString, "Time:  %s, Process %d, Memory management allocate action start\n", time, currentPCB->index );
-                    sprintf( tempString2, "Process %d, Memory management allocate action end", currentPCB->index );
+                    sprintf( tempString, "Time:  %s, Process %d, MMU %s start\n", time, currentPCB->index, currentOp->command );
+                    sprintf( tempString2, "Process %d, MMU %s end:", currentPCB->index, currentOp->command );
                     break;
 
                 case ( 'I' ):
@@ -220,19 +263,40 @@ void executeProcesses( struct Config config, struct Metadata *metadata )
                     break;
             }
 
-            if( currentOp->letter != 'A' && currentOp->letter != 'S')
+            if( currentOp->letter != 'A' && currentOp->letter != 'S' )
             {
                 logMessage( tempString, toFile, toConsole, outFile );
+                if( currentOp->letter == 'M' ) // Handle memory management
+                {
+                    mmu->process = currentOp;
+                    pthread_create(&thread, NULL, memManage, (void *)mmu);
+                    pthread_join(thread, NULL);
+                    if( mmu->failure )
+                    {
+                        accessTimer( LAP_TIMER, time );
+                        sprintf( tempString, "Time:  %s, %s Failed\n", time, tempString2);
+                        logMessage( tempString, toFile, toConsole, outFile );
+                        mmu->failure = 0;
+                    }
+                    else
+                    {
+                        accessTimer( LAP_TIMER, time );
+                        sprintf( tempString, "Time:  %s, %s Success\n", time, tempString2);
+                        logMessage( tempString, toFile, toConsole, outFile );
+                    }
+                }
+                else // Spawn thread and run the clock
+                {
+                    *arg = currentOp->time;
+                    pthread_create(&thread, NULL, runThread, arg);
+                    pthread_join(thread, NULL);
 
-                // Spawn thread and run
-                *arg = currentOp->time;
-                pthread_create(&thread, NULL, runThread, arg);
-                pthread_join(thread, NULL);
+                    // Append time to beginning of end string
+                    accessTimer( LAP_TIMER, time );
+                    sprintf( tempString, "Time:  %s, %s\n", time, tempString2);
+                    logMessage( tempString, toFile, toConsole, outFile );
+                }
 
-                // Append time to beginning of end string
-                accessTimer( LAP_TIMER, time );
-                sprintf( tempString, "Time:  %s, %s\n", time, tempString2);
-                logMessage( tempString, toFile, toConsole, outFile );
             }
             currentOp = currentOp->nextNode;
         }
