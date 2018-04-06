@@ -25,7 +25,7 @@
 const int MAX_STR = 1024;
 
 // Free Function Implementation
-struct Metadata *readMetadata( const char *filename )
+struct Metadata *readMetadata( const char *filename, int ioTime, int processorTime )
 {
     // Open given file, exit if doesnt exist
     FILE *metadataFile = fopen( filename, "r" );
@@ -115,6 +115,33 @@ struct Metadata *readMetadata( const char *filename )
                     {
                         fprintf( stderr, "Error: Found incorrect value in metadata file.\n");
                         exit( 1 );
+                    }
+
+                    switch( currentNode->letter )
+                    {
+                        case( 'A' ):
+                            currentNode->time = 0;
+                            break;
+
+                        case( 'I' ):
+                            currentNode->time = 0;
+                            break;
+
+                        case( 'M' ):
+                            currentNode->time = 100;
+                            break;
+
+                        case( 'O' ):
+                            currentNode->time = ioTime;
+                            break;
+
+                        case( 'P' ):
+                            currentNode->time = ioTime;
+                            break;
+
+                        case( 'S' ):
+                            currentNode->time = processorTime;
+                            break;
                     }
 
                 pushMetadataNode( metadataHead, currentNode );

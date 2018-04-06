@@ -55,6 +55,21 @@ struct PCB *constructPCB( struct Metadata *metadata )
     return PCBHead;
 }
 
+int calcProcessTime( struct PCB *pcb, struct Config config )
+{
+    struct Metadata *current = pcb->process;
+    struct Metadata *next;
+    int processTime = 0;
+
+    while( stringCompare( current->command, "end" ) != 0 )
+    {
+        next = current->nextNode;
+        processTime += current->time;
+        current = next;
+    }
+    return processTime;
+}
+
 // runThread - spawns a thread and runs for the given amount of time
 // input: int oper - idk
 // input: int time - time to wait on a process
@@ -70,14 +85,23 @@ void *runThread( void  *arg )
 // input Metadata metadata - data read from metadata file listed in config
 void executeProcesses( struct Config config, struct Metadata *metadata )
 {
-    // Open file and allocate
-    FILE *outFile = fopen( config.logFilepath, "w" );
-    char* time = malloc( STR_MAX );
+    int scheduling = FCFS;
+    if( stringCompare(config.cpuSchedulingCode, "SJF-N") == 0 )
+    {
+        scheduling = SJF;
+    }
 
     // Set bools for printing options
-    int toConsole = 0, toFile = 0;
-    if( stringCompare( config.logTo, "Monitor" ) == 0 ) toConsole = 1;
-    else if( stringCompare( config.logTo, "File" ) == 0 ) toFile = 1;
+    int toConsole = 0;
+    int toFile = 0;
+    if( stringCompare( config.logTo, "Monitor" ) == 0 )
+    {
+        toConsole = 1;
+    }
+    else if( stringCompare( config.logTo, "File" ) == 0 )
+    {
+        toFile = 1;
+    }
     else // Both
     {
         toConsole = 1;
@@ -85,8 +109,121 @@ void executeProcesses( struct Config config, struct Metadata *metadata )
     }
 
     // File Header
+    FILE *outFile = fopen( config.logFilepath, "w" );
+    writeHeader( config, toFile, toConsole, outFile );
+
+    // Contruct Schedule from metadata linked list
+    struct PCB *PCBHead = constructPCB( metadata );
+    struct PCB *currentPCB = PCBHead;
+
+    char *tempString = malloc( STR_MAX );
+    char *tempString2 = malloc( STR_MAX );
+    char* time = malloc( STR_MAX );
+    accessTimer( LAP_TIMER, time );
+    sprintf( tempString,  "Time:  %s, OS: All proccesses initialized in New state\n", time );
+    logMessage( tempString, toFile, toConsole, outFile );
+
+    // Set all Processes to Ready
+    while ( currentPCB->process != NULL )
+    {
+        currentPCB->state = READY;
+        currentPCB = currentPCB->nextProcess;
+    }
+    accessTimer( LAP_TIMER, time );
+    sprintf( tempString, "Time:  %s, OS: All proccesses now set in Ready state\n", time );
+    logMessage( tempString, toFile, toConsole, outFile );
+
+    // Run processes
+    pthread_t thread;
+    currentPCB = PCBHead;
+    struct Metadata *currentOp;
+    while ( currentPCB->process != NULL )
+    {
+        if( scheduling == SJF )
+        {
+            printf("%s\n", "ay");
+        }
+        else // Default is FCFS
+        {
+            accessTimer( LAP_TIMER, time );
+            sprintf( tempString, "Time:  %s, OS: FCFS-N Strategy selects Process %d\n", time, currentPCB->index );
+            logMessage( tempString, toFile, toConsole, outFile );
+
+            accessTimer( LAP_TIMER, time);
+            sprintf( tempString, "Time:  %s, OS: Process %d set in Running state\n", time, currentPCB->index );
+            logMessage( tempString, toFile, toConsole, outFile );
+            currentOp = currentPCB->process;
+        }
+
+        int *arg = malloc( sizeof( *arg ) );
+        while( stringCompare( currentOp->command, "end" ) != 0 )
+        {
+            // Prepare output Strings
+            accessTimer( LAP_TIMER, time );
+            switch( currentOp->letter )
+            {
+                case ( 'M' ):
+                    sprintf( tempString, "Time:  %s, Process %d, Memory management allocate action start\n", time, currentPCB->index );
+                    sprintf( tempString2, "Process %d, Memory management allocate action end", currentPCB->index );
+                    break;
+
+                case ( 'I' ):
+                    sprintf( tempString, "Time:  %s, Process %d, %s input start\n", time, currentPCB->index, currentOp->command );
+                    sprintf( tempString2, "Process %d, %s input end", currentPCB->index, currentOp->command );
+                    break;
+
+                case ( 'O' ):
+                    sprintf( tempString, "Time:  %s, Process %d, %s output start\n", time, currentPCB->index, currentOp->command );
+                    sprintf( tempString2, "Process %d, %s output end", currentPCB->index, currentOp->command );
+                    break;
+
+                case ( 'P' ):
+                    sprintf( tempString, "Time:  %s, Process %d, Run operation start\n", time, currentPCB->index );
+                    sprintf( tempString2,"Process %d, Run operation end", currentPCB->index );
+                    break;
+            }
+
+            if( currentOp->letter != 'A' && currentOp->letter != 'S')
+            {
+                logMessage( tempString, toFile, toConsole, outFile );
+
+                // Spawn thread and run
+                *arg = currentOp->time;
+                pthread_create(&thread, NULL, runThread, arg);
+                pthread_join(thread, NULL);
+
+                // Append time to beginning of end string
+                accessTimer( LAP_TIMER, time );
+                sprintf( tempString, "Time:  %s, %s\n", time, tempString2);
+                logMessage( tempString, toFile, toConsole, outFile );
+            }
+            currentOp = currentOp->nextNode;
+        }
+
+        accessTimer( LAP_TIMER, time );
+        currentPCB->state = EXIT;
+        sprintf( tempString, "Time:  %s, OS: Process %d set in Exit state\n", time, currentPCB->index );
+        logMessage( tempString, toFile, toConsole, outFile );
+        currentPCB = currentPCB->nextProcess;
+        free( arg );
+    }
+
+    accessTimer( LAP_TIMER, time );
+    sprintf( tempString, "Time:  %s, System stop\n", time);
+    logMessage( tempString, toFile, toConsole, outFile );
+
+    deletePCB( PCBHead );
+    fclose(outFile);
+
+    free( tempString );
+    free( tempString2 );
+    free( time );
+}
+
+void writeHeader(struct Config config, int toFile, int toConsole, FILE *outFile)
+{
     char *tempString = malloc(STR_MAX);
-    char *tempString2 = malloc(STR_MAX);
+    char *time = malloc(STR_MAX);
 
     sprintf( tempString, "OS Simulation 2\n===================\n" );
     logMessage( tempString, toFile, toConsole, outFile );
@@ -105,104 +242,8 @@ void executeProcesses( struct Config config, struct Metadata *metadata )
     sprintf( tempString, "Time:  %s, OS: Begin PCB Creation\n", time );
     logMessage( tempString, toFile, toConsole, outFile );
 
-    // Contruct Schedule from metadata linked list
-    struct PCB *PCBHead = constructPCB( metadata );
-    struct PCB *currentPCB = PCBHead;
-
-    accessTimer( LAP_TIMER, time );
-    sprintf( tempString,  "Time:  %s, OS: All proccesses initialized in New state\n", time );
-    logMessage( tempString, toFile, toConsole, outFile );
-
-    // Set all Processes to Ready
-    while ( currentPCB->process != NULL)
-    {
-        currentPCB->state = READY;
-        currentPCB = currentPCB->nextProcess;
-    }
-    accessTimer( LAP_TIMER, time );
-    sprintf( tempString, "Time:  %s, OS: All proccesses now set in Ready state\n", time );
-    logMessage( tempString, toFile, toConsole, outFile );
-
-    // Run processes
-    pthread_t thread;
-    currentPCB = PCBHead;
-    while ( currentPCB->process != NULL )
-    {
-        accessTimer( LAP_TIMER, time );
-        sprintf( tempString, "Time:  %s, OS: FCFS-N Strategy selects Process %d\n", time, currentPCB->index );
-        logMessage( tempString, toFile, toConsole, outFile );
-
-        accessTimer( LAP_TIMER, time);
-        sprintf( tempString, "Time:  %s, OS: Process %d set in Running state\n", time, currentPCB->index );
-        logMessage( tempString, toFile, toConsole, outFile );
-
-        int *arg = malloc(sizeof(*arg));
-        struct Metadata *currentOp = currentPCB->process;
-        while( stringCompare( currentOp->command, "end" ) != 0 )
-        {
-            switch ( currentOp->letter )
-            {
-                case ( 'M' ):
-                    accessTimer( LAP_TIMER, time );
-                    sprintf( tempString, "Time:  %s, Process %d, Memory management allocate action start\n", time, currentPCB->index );
-                    *arg = 100;
-                    pthread_create(&thread, NULL, runThread, arg);
-                    pthread_join(thread, NULL);
-                    accessTimer( LAP_TIMER, time );
-                    sprintf( tempString2, "Time:  %s, Process %d, Memory management allocate action end\n", time, currentPCB->index );
-                    break;
-
-                case ( 'I' ):
-                    accessTimer( LAP_TIMER, time );
-                    sprintf( tempString, "Time:  %s, Process %d, %s input start\n", time, currentPCB->index, currentOp->command );
-                    *arg = config.ioTime;
-                    pthread_create(&thread, NULL, runThread, arg );
-                    pthread_join(thread, NULL);
-                    accessTimer( LAP_TIMER, time );
-                    sprintf( tempString2, "Time:  %s, Process %d, %s input end\n", time, currentPCB->index, currentOp->command );
-                    break;
-
-                case ( 'O' ):
-                    accessTimer( LAP_TIMER, time );
-                    sprintf( tempString, "Time:  %s, Process %d, %s output start\n", time, currentPCB->index, currentOp->command );
-                    *arg = config.ioTime;
-                    pthread_create(&thread, NULL, runThread, arg );
-                    pthread_join(thread, NULL);
-                    accessTimer( LAP_TIMER, time );
-                    sprintf( tempString2, "Time:  %s, Process %d, %s output end\n", time, currentPCB->index, currentOp->command );
-                    break;
-
-                case ( 'P' ):
-                    accessTimer( LAP_TIMER, time );
-                    sprintf( tempString, "Time:  %s, Run operation start\n", time );
-                    *arg = config.processorTime;
-                    pthread_create(&thread, NULL, runThread, arg );
-                    pthread_join(thread, NULL);
-                    accessTimer( LAP_TIMER, time );
-                    sprintf( tempString2, "Time:  %s, Run operation end\n", time );
-                    break;
-            }
-            currentOp = currentOp->nextNode;
-            logMessage( tempString, toFile, toConsole, outFile );
-            logMessage( tempString2, toFile, toConsole, outFile );
-        }
-
-        accessTimer( LAP_TIMER, time );
-        currentPCB->state = EXIT;
-        sprintf( tempString, "Time:  %s, OS: Process %d set in Exit state\n", time, currentPCB->index );
-        logMessage( tempString, toFile, toConsole, outFile );
-        currentPCB = currentPCB->nextProcess;
-    }
-
-    accessTimer( LAP_TIMER, time );
-    sprintf( tempString, "Time:  %s, System stop\n", time);
-    logMessage( tempString, toFile, toConsole, outFile );
-
-    deletePCB( PCBHead );
-    fclose(outFile);
-
     free( tempString );
-    free( tempString2 );
+    free( time );
 }
 
 // printPCB - iterates through and prints all processes in a PCB
@@ -243,8 +284,15 @@ void deletePCB( struct PCB *head )
 // input: FILE *file    - pointer to output log file
 void logMessage( char *message, int toFile, int toConsole, FILE *file)
 {
-    if( toConsole ) printf( "%s", message );
-    if( toFile ) fprintf( file, "%s", message );
+    if( toConsole )
+    {
+        printf( "%s", message );
+    }
+
+    if( toFile )
+    {
+        fprintf( file, "%s", message );
+    }
 }
 
 // Preprocessor

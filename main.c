@@ -33,7 +33,7 @@ int main( int argc, char const *argv[] )
         exit( 1 );
     }
     struct Config configValues = readConfig( argv[1] );
-    struct Metadata *metadataValues = readMetadata( configValues.filepath );
+    struct Metadata *metadataValues = readMetadata( configValues.filepath, configValues.ioTime, configValues.processorTime );
 
     executeProcesses( configValues, metadataValues );
 

@@ -28,12 +28,13 @@ struct Metadata
   char letter;
   char *command;
   int number;
+  int time;
   struct Metadata *nextNode;
 
 };
 
 // Free Function Prototypes
-struct Metadata *readMetadata(const char *filename);
+struct Metadata *readMetadata(const char *filename, int ioTime, int processorTime );
 struct Metadata *createMetadataNode(char *string);
 void pushMetadataNode(struct Metadata *head, struct Metadata *node);
 void printMetadata(struct Metadata *head);
