@@ -52,12 +52,15 @@ struct PCB *constructPCB( struct Metadata *metadata, struct Config config )
     currentPCB = NULL;
     free( currentPCB );
 
-    if( stringCompare(config.cpuSchedulingCode, "SJF-N") == 0 )
+    // printPCB(PCBHead);
+
+    if( stringCompare(config.cpuSchedulingCode, "SJF-N") == 0 &&
+            PCBHead->nextProcess->process != NULL) // edge case: single node
     {
         PCBHead = bubbleSort(PCBHead);
     }
 
-    printPCB(PCBHead);
+    // printPCB(PCBHead);
     return PCBHead;
 }
 
@@ -136,11 +139,6 @@ void *memManage( void  *arg )
     struct MMU *mmu = ( (struct MMU *) arg );
     if( stringCompare( mmu->process->command , "allocate" ) == 0)
     {
-        mmu->request = mmu->process->number % 1000;
-        int remain = mmu->process->number /= 1000;
-        mmu->base = remain % 1000;
-        mmu->segment = remain /= 1000;
-
         if( (mmu->base + mmu->segment) > mmu->maxMem)
         {
             mmu->failure = 1;
@@ -243,7 +241,11 @@ void executeProcesses( struct Config config, struct Metadata *metadata )
             switch( currentOp->letter )
             {
                 case ( 'M' ):
-                    sprintf( tempString, "Time:  %s, Process %d, MMU %s start\n", time, currentPCB->index, currentOp->command );
+                    mmu->request = currentOp->number % 1000;
+                    int remain = currentOp->number /= 1000;
+                    mmu->base = remain % 1000;
+                    mmu->segment = remain /= 1000;
+                    sprintf( tempString, "Time:  %s, Process %d, MMU %s start: %d/%d/%d\n", time, currentPCB->index, currentOp->command, mmu->segment, mmu->base, mmu->request );
                     sprintf( tempString2, "Process %d, MMU %s end:", currentPCB->index, currentOp->command );
                     break;
 
