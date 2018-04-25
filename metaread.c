@@ -159,7 +159,7 @@ struct Metadata *readMetadata( const char *filename, int ioTime, int processorTi
     }
 
     fclose(metadataFile);
-    printMetadata( metadataHead );
+    // printMetadata( metadataHead );
     return metadataHead;
 }
 

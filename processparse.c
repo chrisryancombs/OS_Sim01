@@ -61,13 +61,16 @@ struct PCB *constructPCB( struct Metadata *metadata, struct Config config )
         }
         currentMD = currentMD->nextNode;
     }
-    if( stringCompare(config.cpuSchedulingCode, "SJF-N"))
+
+    if( stringCompare(config.cpuSchedulingCode, "SJF-N") == 0)
     {
         PCBHead = bubbleSort(PCBHead);
+        return PCBHead;
     }
-
-    printPCB(PCBHead);
-    return PCBHead;
+    else // FCFS-N, FCFS-P
+    {
+        return PCBHead;
+    }
 }
 
 // bubbleSort - sorts a PCB from least to greatest processing time
