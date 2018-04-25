@@ -1,0 +1,106 @@
+OS Simulation 2
+===================
+Using metadata file: testfiles/testfile.mdf
+Using log file:      logfile_1.lgf
+===================
+Time:   0.000000, System Start
+Time:   0.000004, OS: Begin PCB Creation
+Time:   0.000345, OS: All proccesses initialized in New state
+Time:   0.000353, OS: All proccesses now set in Ready state
+Time:   0.000356, OS: FCFS-N Strategy selects Process 3 with time: 140 mSec
+Time:   0.000359, OS: Process 3 set in Running state
+Time:   0.000363, Process 3, Run operation start
+Time:   0.020494, Process 3, Run operation end
+Time:   0.020531, Process 3, Run operation start
+Time:   0.040634, Process 3, Run operation end
+Time:   0.040669, Process 3, printer output start
+Time:   0.060764, Process 3, printer output end
+Time:   0.060828, Process 3, hard drive input start
+Time:   0.060972, Process 3, hard drive input end
+Time:   0.060982, Process 3, hard drive output start
+Time:   0.081059, Process 3, hard drive output end
+Time:   0.081081, Process 3, keyboard input start
+Time:   0.081142, Process 3, keyboard input end
+Time:   0.081148, Process 3, Run operation start
+Time:   0.101206, Process 3, Run operation end
+Time:   0.101230, Process 3, hard drive output start
+Time:   0.121309, Process 3, hard drive output end
+Time:   0.121330, Process 3, Run operation start
+Time:   0.141434, Process 3, Run operation end
+Time:   0.141458, Process 3, hard drive input start
+Time:   0.141546, Process 3, hard drive input end
+Time:   0.141553, OS: Process 3 set in Exit state
+Time:   0.141557, OS: FCFS-N Strategy selects Process 4 with time: 160 mSec
+Time:   0.141561, OS: Process 4 set in Running state
+Time:   0.141576, Process 4, hard drive output start
+Time:   0.161645, Process 4, hard drive output end
+Time:   0.161667, Process 4, printer output start
+Time:   0.181743, Process 4, printer output end
+Time:   0.181764, Process 4, Run operation start
+Time:   0.201824, Process 4, Run operation end
+Time:   0.201844, Process 4, Run operation start
+Time:   0.221913, Process 4, Run operation end
+Time:   0.221935, Process 4, hard drive input start
+Time:   0.223381, Process 4, hard drive input end
+Time:   0.223404, Process 4, Run operation start
+Time:   0.243479, Process 4, Run operation end
+Time:   0.243500, Process 4, printer output start
+Time:   0.263617, Process 4, printer output end
+Time:   0.263637, Process 4, hard drive output start
+Time:   0.283715, Process 4, hard drive output end
+Time:   0.283736, Process 4, hard drive input start
+Time:   0.283896, Process 4, hard drive input end
+Time:   0.283907, Process 4, Run operation start
+Time:   0.303963, Process 4, Run operation end
+Time:   0.304011, OS: Process 4 set in Exit state
+Time:   0.304019, OS: FCFS-N Strategy selects Process 0 with time: 180 mSec
+Time:   0.304022, OS: Process 0 set in Running state
+Time:   0.304026, Process 0, MMU allocate start: 0/123/456
+Time:   0.304150, Process 0, MMU allocate end: Success
+Time:   0.304159, Process 0, hard drive input start
+Time:   0.304221, Process 0, hard drive input end
+Time:   0.304228, Process 0, hard drive output start
+Time:   0.324282, Process 0, hard drive output end
+Time:   0.324302, Process 0, keyboard input start
+Time:   0.324363, Process 0, keyboard input end
+Time:   0.324370, Process 0, hard drive input start
+Time:   0.324464, Process 0, hard drive input end
+Time:   0.324472, Process 0, hard drive output start
+Time:   0.344536, Process 0, hard drive output end
+Time:   0.344556, Process 0, hard drive output start
+Time:   0.364660, Process 0, hard drive output end
+Time:   0.364694, Process 0, printer output start
+Time:   0.384813, Process 0, printer output end
+Time:   0.384832, Process 0, keyboard input start
+Time:   0.384906, Process 0, keyboard input end
+Time:   0.384915, Process 0, keyboard input start
+Time:   0.385073, Process 0, keyboard input end
+Time:   0.385083, Process 0, keyboard input start
+Time:   0.385142, Process 0, keyboard input end
+Time:   0.385149, OS: Process 0 set in Exit state
+Time:   0.385154, OS: FCFS-N Strategy selects Process 2 with time: 220 mSec
+Time:   0.385157, OS: Process 2 set in Running state
+Time:   0.385210, Process 2, MMU access start: 0/654/321
+Time:   0.385292, Process 2, MMU access end: Failed
+Time:   0.385301, Process 2, printer output start
+Time:   0.405360, Process 2, printer output end
+Time:   0.405379, Process 2, printer output start
+Time:   0.425456, Process 2, printer output end
+Time:   0.425505, Process 2, hard drive input start
+Time:   0.425711, Process 2, hard drive input end
+Time:   0.425734, Process 2, hard drive output start
+Time:   0.445832, Process 2, hard drive output end
+Time:   0.445854, Process 2, printer output start
+Time:   0.465924, Process 2, printer output end
+Time:   0.465944, Process 2, Run operation start
+Time:   0.486026, Process 2, Run operation end
+Time:   0.486043, Process 2, Run operation start
+Time:   0.506109, Process 2, Run operation end
+Time:   0.506127, Process 2, keyboard input start
+Time:   0.506324, Process 2, keyboard input end
+Time:   0.506336, Process 2, keyboard input start
+Time:   0.506409, Process 2, keyboard input end
+Time:   0.506418, Process 2, hard drive input start
+Time:   0.506608, Process 2, hard drive input end
+Time:   0.506619, OS: Process 2 set in Exit state
+Time:   0.506624, System stop

@@ -32,35 +32,41 @@ struct PCB *constructPCB( struct Metadata *metadata, struct Config config )
 {
     int index = 0;
     struct Metadata *currentMD = metadata;
-    struct PCB *PCBHead = malloc( sizeof( struct PCB ) );
-    struct PCB *currentPCB = PCBHead;
+    struct PCB *PCBHead = NULL;
 
     while ( currentMD != NULL )
     {
         if ( currentMD->letter == 'A' && stringCompare( currentMD->command, "start") == 0 )
         {
+            struct PCB *currentPCB = malloc( sizeof( struct PCB ) );
             currentPCB->index = index++;
             currentPCB->process = currentMD;
             currentPCB->time = calcProcessTime( currentPCB );
             currentPCB->state = 0;
+            currentPCB->nextProcess = NULL;
 
-            currentPCB->nextProcess = malloc( sizeof( struct PCB ) );
-            currentPCB = currentPCB->nextProcess;
+            if(PCBHead == NULL)
+            {
+                PCBHead = currentPCB;
+            }
+            else
+            {
+                struct PCB *current = PCBHead;
+                while( current->nextProcess != NULL )
+                {
+                    current = current->nextProcess;
+                }
+                current->nextProcess = currentPCB;
+            }
         }
         currentMD = currentMD->nextNode;
     }
-    currentPCB = NULL;
-    free( currentPCB );
-
-    // printPCB(PCBHead);
-
-    if( stringCompare(config.cpuSchedulingCode, "SJF-N") == 0 &&
-            PCBHead->nextProcess->process != NULL) // edge case: single node
+    if( stringCompare(config.cpuSchedulingCode, "SJF-N"))
     {
         PCBHead = bubbleSort(PCBHead);
     }
 
-    // printPCB(PCBHead);
+    printPCB(PCBHead);
     return PCBHead;
 }
 
