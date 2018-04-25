@@ -4,7 +4,7 @@ CFLAGS = -Wall -std=c99 -pedantic -c $(DEBUG)
 LFLAGS = -Wall -std=c99 -pedantic -pthread $(DEBUG)
 
 sim03: main.o configread.o metaread.o processparse.o simtimer.o utilities.o
-	$(CC) $(LFLAGS) main.o configread.o metaread.o processparse.o simtimer.o utilities.o -o sim03
+	$(CC) $(LFLAGS) main.o configread.o metaread.o processparse.o simtimer.o utilities.o -o sim04
 
 main.o: main.c
 	$(CC) $(CFLAGS) main.c
@@ -25,4 +25,4 @@ utilities.o: utilities.c utilities.h
 	$(CC) $(CFLAGS) utilities.c
 
 clean:
-	rm -rf *.o ./sim03
+	rm -rf *.o ./sim04

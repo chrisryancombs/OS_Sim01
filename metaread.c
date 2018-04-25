@@ -36,9 +36,7 @@ struct Metadata *readMetadata( const char *filename, int ioTime, int processorTi
     }
 
     // Create Parent and child node for linked list
-    struct Metadata *metadataHead = ( struct Metadata * ) malloc( sizeof( struct Metadata )  );
-    metadataHead->command = malloc( MAX_STR );
-    metadataHead->nextNode = NULL;
+    struct Metadata *metadataHead = NULL;
 
     char line[MAX_STR];
     int lineCount = 0;
@@ -58,10 +56,6 @@ struct Metadata *readMetadata( const char *filename, int ioTime, int processorTi
         {
             fprintf( stderr, "Error: No start statement" );
             exit( 1 );
-        }
-        else
-        {
-
         }
 
         if( stringCompare( line, "Start Program Meta-Data Code:\n" ) ==0 )
@@ -144,7 +138,15 @@ struct Metadata *readMetadata( const char *filename, int ioTime, int processorTi
                             break;
                     }
 
-                pushMetadataNode( metadataHead, currentNode );
+                if( metadataHead == NULL)
+                {
+                    fprintf(stderr, "%s\n", "first");
+                    metadataHead = currentNode;
+                }
+                else
+                {
+                    pushMetadataNode( metadataHead, currentNode );
+                }
 
                 if( stringCompare( line, "" ) == 0 || stringCompare( right, "" ) == 0 )
                 {
@@ -157,11 +159,8 @@ struct Metadata *readMetadata( const char *filename, int ioTime, int processorTi
     }
 
     fclose(metadataFile);
-    struct Metadata *metadataReturn = metadataHead->nextNode;
-    free(metadataHead->command);
-    free(metadataHead);
-    // printMetadata( metadataReturn );
-    return metadataReturn;
+    printMetadata( metadataHead );
+    return metadataHead;
 }
 
 // Free Function Implementation
@@ -205,7 +204,6 @@ struct Metadata *createMetadataNode( char *string )
 
 void pushMetadataNode( struct Metadata *head, struct Metadata *node )
 {
-
     struct Metadata *current = head;
     while( current->nextNode != NULL )
     {
